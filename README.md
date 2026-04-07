@@ -130,6 +130,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\setup-windows.ps1 -SkipInstal
 - [`desktop-bundle.yml`](./.github/workflows/desktop-bundle.yml)
   - 在 `workflow_dispatch` 或 `v*` tag push 时运行
   - 自动构建 macOS 和 Windows 桌面包
+  - macOS 产出 `.app + zip`，避免 GitHub Runner 上不稳定的 `.dmg` 打包步骤
   - 手动触发时上传构建产物到 GitHub Actions Artifacts
   - 推送 `v*` tag 时自动创建 GitHub Release 并挂载构建产物
 

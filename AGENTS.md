@@ -171,6 +171,11 @@ Windows 新手环境初始化：
 - macOS `.app` 和 `.zip` 是当前最稳定的交付产物
 - Windows 兼容性已经做过代码级收口，但若要 100% 确认，仍需要真实 Windows 机器黑盒验证
 
+GitHub 打包约束：
+
+- CI / Release 工作流不要默认依赖 `.dmg`
+- GitHub 上的 macOS 产物以 `.app + zip` 为主
+
 ## Acceptance Checklist
 
 改完后至少确认：
