@@ -121,6 +121,11 @@ Windows 新手环境初始化：
 
 如果用户说“直接在 GitHub 上打包给我”，优先使用 `Desktop Bundle` 工作流，而不是要求用户本地打包。
 
+发布约定：
+
+- 手动触发 `Desktop Bundle`：只产出 Actions artifacts
+- 推送 `v*` tag：自动创建或更新 GitHub Release，并上传产物
+
 ## Standard Workflow
 
 1. 先复述用户目标
