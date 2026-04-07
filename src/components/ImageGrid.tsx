@@ -3,15 +3,26 @@ import { useAppStore } from '../stores/appStore';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { writeImage } from '@tauri-apps/plugin-clipboard-manager';
 import Masonry from 'react-masonry-css';
-import type { ImageInfo } from '../types';
+import { UNTAGGED_TAG_ID, type ImageInfo } from '../types';
 
-const CARD_GAP = 12;
+const CARD_GAP = 20;
+const IMAGE_FILE_PATTERN = /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i;
 
 interface ContextMenuState {
   visible: boolean;
   x: number;
   y: number;
   imageId: string | null;
+}
+
+interface ImageDetailsProps {
+  image: ImageInfo;
+  tagNames: string[];
+  allTags: Array<{ id: string; name: string }>;
+  activeTagIds: string[];
+  onToggleTag: (tagId: string) => Promise<void>;
+  onDelete: () => Promise<void>;
+  onClose: () => void;
 }
 
 interface ImageCardProps {
@@ -39,7 +50,7 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
 
   return (
     <div
-      className="relative group rounded-lg overflow-hidden bg-[var(--color-bg-card)] cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.02]"
+      className="group cursor-pointer select-none"
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
       style={{ marginBottom: CARD_GAP }}
@@ -51,12 +62,11 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
     >
       {/* Loading skeleton */}
       {!loaded && !error && (
-        <div className="absolute inset-0 bg-[var(--color-bg-card)] animate-pulse" />
+        <div className="h-64 rounded-[24px] bg-[var(--color-bg-card)] animate-pulse" />
       )}
 
-      {/* Error state */}
       {error && (
-        <div className="flex items-center justify-center bg-[var(--color-bg-card)] text-[var(--color-text-secondary)] py-8">
+        <div className="flex min-h-64 items-center justify-center rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] text-[var(--color-text-secondary)] py-8">
           <div className="text-center">
             <div className="text-2xl mb-2">⚠️</div>
             <div className="text-xs">加载失败</div>
@@ -64,49 +74,60 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
         </div>
       )}
 
-      {/* Image */}
       {imageSrc && (
-        <img
-          src={imageSrc}
-          alt={image.original_name || image.filename}
-          className={`w-full h-auto object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-          loading="lazy"
-          draggable={false}
-        />
+        <div className="relative overflow-hidden rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[#1b1d21] shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-[rgba(255,255,255,0.12)] group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.24)]">
+          <img
+            src={imageSrc}
+            alt={image.originalName || image.filename}
+            className={`block w-full h-auto object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={() => setLoaded(true)}
+            onError={() => {
+              console.error('Failed to load image source:', imageSrc, image);
+              setError(true);
+            }}
+            loading="lazy"
+            draggable={false}
+          />
+          <div
+            className={`absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 p-4 transition-opacity duration-200 ${showActions ? 'opacity-100' : 'opacity-0'} bg-gradient-to-t from-black/78 via-black/16 to-transparent`}
+          >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddTag(image.id);
+              }}
+              className="rounded-full bg-white/16 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/26"
+            >
+              标签
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(image.id);
+              }}
+              className="rounded-full bg-[var(--color-error)] px-3 py-1.5 text-[11px] font-medium text-white transition-colors hover:bg-[var(--color-error)]"
+            >
+              删除
+            </button>
+          </div>
+        </div>
       )}
 
-      {/* Hover overlay */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-3 transition-opacity duration-200 ${showActions ? 'opacity-100' : 'opacity-0'}`}
-      >
-        {image.original_name && (
-          <div className="text-white text-xs truncate mb-2">
-            {image.original_name}
+      {!error && (
+        <div className="flex items-start justify-between gap-3 px-1.5 pt-3">
+          <div className="min-w-0">
+            <div className="truncate text-[13px] font-medium text-[var(--color-text-primary)]">
+              {image.originalName || image.filename}
+            </div>
+            <div className="mt-1 text-[11px] text-[var(--color-text-disabled)]">
+              {image.source === 'cdn' ? 'CDN 导入' : image.source === 'paste' ? '粘贴导入' : '本地导入'}
+            </div>
           </div>
-        )}
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddTag(image.id);
-            }}
-            className="px-2 py-1 bg-white/20 hover:bg-white/30 text-white text-xs rounded backdrop-blur-sm transition-colors"
-          >
-            标签
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(image.id);
-            }}
-            className="px-2 py-1 bg-red-500/80 hover:bg-red-500 text-white text-xs rounded transition-colors"
-          >
-            删除
-          </button>
+          <span className="shrink-0 rounded-full border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] px-2 py-1 text-[10px] text-[var(--color-text-secondary)]">
+            {image.width}×{image.height}
+          </span>
         </div>
-      </div>
+      )}
     </div>
   );
 });
@@ -138,7 +159,7 @@ const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onDelet
 
   return (
     <div
-      className="relative group rounded-lg overflow-hidden bg-[var(--color-bg-card)] cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-[1.02] aspect-square"
+      className="relative group overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.05)] bg-[var(--color-bg-card)] cursor-pointer transition-colors duration-200 hover:bg-[#333333] aspect-square"
       onClick={() => onClick(image.id)}
       onContextMenu={(e) => onContextMenu(e, image.id)}
       draggable
@@ -159,25 +180,28 @@ const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onDelet
       {imageSrc && (
         <img
           src={imageSrc}
-          alt={image.original_name || image.filename}
+          alt={image.originalName || image.filename}
           className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
+          onError={() => {
+            console.error('Failed to load image source:', imageSrc, image);
+            setError(true);
+          }}
           loading="lazy"
           draggable={false}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+      <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)] opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
         <div className="flex gap-1 w-full justify-end">
           <button
             onClick={(e) => { e.stopPropagation(); onAddTag(image.id); }}
-            className="px-2 py-1 bg-white/20 hover:bg-white/30 text-white text-xs rounded backdrop-blur-sm transition-colors"
+            className="px-2 py-1 bg-[rgba(255,255,255,0.18)] hover:bg-[rgba(255,255,255,0.26)] text-white text-xs rounded transition-colors"
           >
             标签
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDelete(image.id); }}
-            className="px-2 py-1 bg-red-500/80 hover:bg-red-500 text-white text-xs rounded transition-colors"
+            className="px-2 py-1 bg-[var(--color-error)] hover:bg-[var(--color-error)] text-white text-xs rounded transition-colors"
           >
             删除
           </button>
@@ -274,11 +298,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
 
   return (
     <div
-      className="fixed inset-0 bg-black/95 z-50 flex flex-col"
+      className="fixed inset-0 z-50 flex flex-col bg-[#101010]"
       onClick={onClose}
     >
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/50 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-[rgba(16,16,16,0.92)] border-b border-[rgba(255,255,255,0.08)]">
         <div className="text-white text-sm">
           {currentIndex + 1} / {images.length}
         </div>
@@ -286,20 +310,20 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
           <div className="flex items-center gap-2 text-white text-xs">
             <button
               onClick={(e) => { e.stopPropagation(); setScale(s => Math.max(0.5, s - 0.25)); }}
-              className="px-2 py-1 bg-white/20 rounded hover:bg-white/30"
+              className="px-2 py-1 rounded bg-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.22)]"
             >
               −
             </button>
             <span className="w-12 text-center">{Math.round(scale * 100)}%</span>
             <button
               onClick={(e) => { e.stopPropagation(); setScale(s => Math.min(3, s + 0.25)); }}
-              className="px-2 py-1 bg-white/20 rounded hover:bg-white/30"
+              className="px-2 py-1 rounded bg-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.22)]"
             >
               +
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setScale(1); setPosition({ x: 0, y: 0 }); }}
-              className="px-2 py-1 bg-white/20 rounded hover:bg-white/30 ml-2"
+              className="ml-2 px-2 py-1 rounded bg-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.22)]"
             >
               100%
             </button>
@@ -314,11 +338,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
       </div>
 
       {/* Image info */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-gradient-to-t from-black/50 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-[rgba(16,16,16,0.92)] border-t border-[rgba(255,255,255,0.08)]">
         <div className="flex items-center justify-between text-white text-xs">
           <div>
-            {currentImage.original_name && (
-              <div className="font-medium">{currentImage.original_name}</div>
+            {currentImage.originalName && (
+              <div className="font-medium">{currentImage.originalName}</div>
             )}
             <div className="text-gray-400 mt-1">
               {currentImage.width} × {currentImage.height} • {formatFileSize(currentImage.size)}
@@ -333,7 +357,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
       {/* Navigation arrows */}
       {currentIndex > 0 && (
         <button
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-2xl transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.2)]"
           onClick={(e) => {
             e.stopPropagation();
             onNavigate(images[currentIndex - 1].id);
@@ -344,7 +368,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
       )}
       {currentIndex < images.length - 1 && (
         <button
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-2xl transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.2)]"
           onClick={(e) => {
             e.stopPropagation();
             onNavigate(images[currentIndex + 1].id);
@@ -379,8 +403,97 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
       </div>
 
       {/* Help hint */}
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 text-gray-400 text-xs bg-black/30 px-3 py-1 rounded-full">
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 rounded-full px-3 py-1 text-xs text-gray-400 bg-[rgba(16,16,16,0.92)] border border-[rgba(255,255,255,0.08)]">
         ← → 导航 | 滚轮缩放 | ESC 关闭
+      </div>
+    </div>
+  );
+};
+
+const ImageDetailsModal: React.FC<ImageDetailsProps> = ({
+  image,
+  tagNames,
+  allTags,
+  activeTagIds,
+  onToggleTag,
+  onDelete,
+  onClose,
+}) => {
+  const details = [
+    ['原始名称', image.originalName || '未记录'],
+    ['文件名', image.filename],
+    ['分辨率', `${image.width} × ${image.height}`],
+    ['大小', formatFileSize(image.size)],
+    ['来源', image.source === 'paste' ? '粘贴' : image.source === 'cdn' ? 'CDN' : '本地文件'],
+    ['导入时间', new Date(image.importedAt).toLocaleString()],
+    ['标签', tagNames.length > 0 ? tagNames.join(' / ') : '未分类'],
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-[rgba(16,16,16,0.82)]" onClick={onClose}>
+      <div
+        className="w-full max-w-lg rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-4">
+          <div>
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)]">图片详情</h3>
+            <p className="mt-1 text-xs text-[var(--color-text-secondary)]">查看当前图片的基础信息</p>
+          </div>
+          <button
+            className="text-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="space-y-3 px-5 py-4">
+          {details.map(([label, value]) => (
+            <div key={label} className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+              <span className="text-[var(--color-text-secondary)]">{label}</span>
+              <span className="break-all text-[var(--color-text-primary)]">{value}</span>
+            </div>
+          ))}
+
+          <div className="pt-2">
+            <div className="mb-2 text-xs uppercase tracking-wider text-[var(--color-text-secondary)]">
+              快速管理标签
+            </div>
+            {allTags.length === 0 ? (
+              <div className="text-sm text-[var(--color-text-disabled)]">暂无标签，请先在侧边栏创建。</div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {allTags.map((tag) => {
+                  const active = activeTagIds.includes(tag.id);
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => void onToggleTag(tag.id)}
+                      className={`rounded-full border px-3 py-1 text-xs transition ${
+                        active
+                          ? 'border-[var(--color-accent)] bg-[#2d325f] text-[var(--color-text-primary)]'
+                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-text-primary)]'
+                      }`}
+                    >
+                      {active ? '✓ ' : ''}
+                      {tag.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end border-t border-[var(--color-border)] px-5 py-4">
+          <button
+            onClick={() => void onDelete()}
+            className="rounded-lg bg-[var(--color-error)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-error)]"
+          >
+            删除图片
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -394,9 +507,21 @@ function formatFileSize(bytes: number): string {
 
 // Main ImageGrid with drag-drop, context menu, view modes
 export const ImageGrid: React.FC = () => {
-  const { getFilteredImages, deleteImage, addImageTagRelation, tags, saveImageFromBase64, selectedTagId, viewMode, getImagePath, setDraggingImageId } = useAppStore();
+  const getFilteredImages = useAppStore(state => state.getFilteredImages);
+  const deleteImage = useAppStore(state => state.deleteImage);
+  const addImageTagRelation = useAppStore(state => state.addImageTagRelation);
+  const removeImageTagRelation = useAppStore(state => state.removeImageTagRelation);
+  const relations = useAppStore(state => state.relations);
+  const tags = useAppStore(state => state.tags);
+  const saveImageFromFile = useAppStore(state => state.saveImageFromFile);
+  const selectedTagId = useAppStore(state => state.selectedTagId);
+  const viewMode = useAppStore(state => state.viewMode);
+  const getImagePath = useAppStore(state => state.getImagePath);
+  const setDraggingImageId = useAppStore(state => state.setDraggingImageId);
+  const pushNotification = useAppStore(state => state.pushNotification);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [detailImageId, setDetailImageId] = useState<string | null>(null);
   const [showTagSelector, setShowTagSelector] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({ visible: false, x: 0, y: 0, imageId: null });
@@ -406,6 +531,13 @@ export const ImageGrid: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (confirm('确定要删除这张图片吗？')) {
       await deleteImage(id);
+      pushNotification('图片已删除', 'success');
+      if (selectedImageId === id) {
+        setSelectedImageId(null);
+      }
+      if (detailImageId === id) {
+        setDetailImageId(null);
+      }
     }
   };
 
@@ -415,8 +547,12 @@ export const ImageGrid: React.FC = () => {
 
   const handleSelectTag = async (tagId: string) => {
     if (showTagSelector) {
-      await addImageTagRelation(showTagSelector, tagId);
-      setShowTagSelector(null);
+      const hasRelation = relations.some(relation => relation.imageId === showTagSelector && relation.tagId === tagId);
+      if (hasRelation) {
+        await removeImageTagRelation(showTagSelector, tagId);
+      } else {
+        await addImageTagRelation(showTagSelector, tagId);
+      }
     }
   };
 
@@ -440,14 +576,16 @@ export const ImageGrid: React.FC = () => {
     try {
       const path = await getImagePath(image.filename);
       await writeImage(path);
+      pushNotification('图片已复制到剪贴板', 'success');
     } catch (err) {
       console.error('Failed to copy image:', err);
+      pushNotification('复制图片失败', 'error');
     }
   };
 
   const handleViewDetail = (imageId: string) => {
     closeContextMenu();
-    setSelectedImageId(imageId);
+    setDetailImageId(imageId);
   };
 
   const handleContextAddTag = (imageId: string) => {
@@ -473,6 +611,17 @@ export const ImageGrid: React.FC = () => {
     };
   }, [contextMenu.visible]);
 
+  useEffect(() => {
+    if (!showTagSelector) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowTagSelector(null);
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [showTagSelector]);
+
   // Drag and drop handlers for file import
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -494,19 +643,26 @@ export const ImageGrid: React.FC = () => {
     setIsDragOver(false);
 
     const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    const imageFiles = files.filter(f => f.type.startsWith('image/') || IMAGE_FILE_PATTERN.test(f.name));
 
+    const failures: string[] = [];
     for (const file of imageFiles) {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64 = event.target?.result as string;
-        if (base64) {
-          await saveImageFromBase64(base64, 'file');
-        }
-      };
-      reader.readAsDataURL(file);
+      try {
+        await saveImageFromFile(file, 'file');
+      } catch (error) {
+        console.error('Drag import failed:', error);
+        failures.push(file.name);
+      }
     }
-  }, [saveImageFromBase64]);
+
+    if (imageFiles.length > 0) {
+      if (failures.length === 0) {
+        pushNotification(`已导入 ${imageFiles.length} 张本地图片`, 'success');
+      } else {
+        pushNotification(`拖拽导入完成，失败 ${failures.length} 张`, 'error');
+      }
+    }
+  }, [pushNotification, saveImageFromFile]);
 
   // Drag start for image-to-tag drag
   const handleDragStart = (e: React.DragEvent, image: ImageInfo) => {
@@ -521,48 +677,73 @@ export const ImageGrid: React.FC = () => {
   };
 
   const breakpointColumns = {
-    default: 4,
-    1600: 3,
-    1200: 2,
-    800: 2,
-    500: 1
+    default: 6,
+    1800: 5,
+    1560: 4,
+    1220: 3,
+    840: 2,
+    560: 1
   };
+
+  const rootTags = tags
+    .filter(tag => tag.parentId === null)
+    .sort((a, b) => a.order - b.order);
+
+  const renderTagOptions = (parentId: string | null = null, level = 0): React.ReactNode =>
+    tags
+      .filter(tag => tag.parentId === parentId)
+      .sort((a, b) => a.order - b.order)
+      .map(tag => (
+        <React.Fragment key={tag.id}>
+          <button
+            onClick={() => handleSelectTag(tag.id)}
+            className="flex w-full items-center justify-between gap-3 rounded px-2 py-1.5 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)]"
+            style={{ paddingLeft: `${8 + level * 18}px` }}
+          >
+            <span>
+              {level > 0 ? '└ ' : ''}
+              {tag.name}
+            </span>
+            {showTagSelector && relations.some(relation => relation.imageId === showTagSelector && relation.tagId === tag.id) && (
+              <span className="text-[var(--color-accent)]">✓</span>
+            )}
+          </button>
+          {renderTagOptions(tag.id, level + 1)}
+        </React.Fragment>
+      ));
+
+  const detailImage = detailImageId ? images.find(image => image.id === detailImageId) ?? null : null;
+  const detailImageTagIds = detailImage
+    ? relations.filter(relation => relation.imageId === detailImage.id).map(relation => relation.tagId)
+    : [];
+  const detailImageTagNames = detailImage
+    ? relations
+        .filter(relation => relation.imageId === detailImage.id)
+        .map(relation => tags.find(tag => tag.id === relation.tagId)?.name)
+        .filter((value): value is string => Boolean(value))
+    : [];
+  const flattenedTags = tags
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .map(tag => ({ id: tag.id, name: tag.name }));
 
   return (
     <div className="h-full flex flex-col relative">
       {/* Tag selector dropdown */}
       {showTagSelector && (
         <div
-          className="absolute top-4 right-4 w-56 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg shadow-xl z-40 p-2"
+          className="absolute top-4 right-4 z-40 w-56 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] p-2"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="text-xs text-[var(--color-text-secondary)] px-2 py-1 mb-1">
-            选择标签
+            再次点击已选标签可移除
           </div>
-          {tags.filter(t => t.parentId === null).length === 0 ? (
+          {rootTags.length === 0 ? (
             <div className="text-xs text-[var(--color-text-disabled)] px-2 py-2">
               暂无标签，请先在侧边栏创建
             </div>
           ) : (
-            tags.filter(t => t.parentId === null).map(tag => (
-              <div key={tag.id}>
-                <button
-                  onClick={() => handleSelectTag(tag.id)}
-                  className="w-full text-left px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] rounded"
-                >
-                  {tag.name}
-                </button>
-                {tags.filter(t => t.parentId === tag.id).map(child => (
-                  <button
-                    key={child.id}
-                    onClick={() => handleSelectTag(child.id)}
-                    className="w-full text-left px-2 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] rounded ml-4"
-                  >
-                    {child.name}
-                  </button>
-                ))}
-              </div>
-            ))
+            renderTagOptions()
           )}
           <button
             onClick={() => setShowTagSelector(null)}
@@ -576,7 +757,7 @@ export const ImageGrid: React.FC = () => {
       {/* Context menu */}
       {contextMenu.visible && (
         <div
-          className="fixed bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg shadow-xl z-50 py-1 min-w-[160px]"
+          className="fixed z-50 min-w-[160px] rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] py-1"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -611,7 +792,12 @@ export const ImageGrid: React.FC = () => {
       {/* Grid */}
       <div
         ref={containerRef}
-        className={`flex-1 overflow-y-auto p-6 transition-colors ${isDragOver ? 'bg-[var(--color-accent)]/10' : ''}`}
+        className={`flex-1 overflow-y-auto px-6 py-6 transition-colors ${isDragOver ? 'bg-[var(--color-accent)]/10' : ''}`}
+        onClick={() => {
+          if (showTagSelector) {
+            setShowTagSelector(null);
+          }
+        }}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -623,7 +809,7 @@ export const ImageGrid: React.FC = () => {
                 <span className="text-4xl opacity-50">📷</span>
               </div>
               <p className="text-[var(--color-text-secondary)] text-lg mb-2">
-                {selectedTagId ? '该标签下没有图片' : '暂无图片'}
+                {selectedTagId === UNTAGGED_TAG_ID ? '暂无未分类图片' : selectedTagId ? '该标签下没有图片' : '暂无图片'}
               </p>
               <p className="text-sm text-[var(--color-text-disabled)]">
                 粘贴图片 (Ctrl/Cmd + V) 或拖拽图片到此处
@@ -631,26 +817,28 @@ export const ImageGrid: React.FC = () => {
             </div>
           </div>
         ) : viewMode === 'masonry' ? (
-          <Masonry
-            breakpointCols={breakpointColumns}
-            className="flex w-auto -ml-4"
-            columnClassName="pl-4 bg-clip-padding"
-          >
-            {images.map(image => (
-              <ImageCard
-                key={image.id}
-                image={image}
-                onDelete={handleDelete}
-                onAddTag={handleAddTag}
-                onClick={setSelectedImageId}
-                onContextMenu={handleContextMenu}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-              />
-            ))}
-          </Masonry>
+          <div className="mx-auto w-full max-w-[1800px]">
+            <Masonry
+              breakpointCols={breakpointColumns}
+              className="flex w-auto -ml-5"
+              columnClassName="pl-5 bg-clip-padding"
+            >
+              {images.map(image => (
+                <ImageCard
+                  key={image.id}
+                  image={image}
+                  onDelete={handleDelete}
+                  onAddTag={handleAddTag}
+                  onClick={setSelectedImageId}
+                  onContextMenu={handleContextMenu}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                />
+              ))}
+            </Masonry>
+          </div>
         ) : (
-          <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+          <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
             {images.map(image => (
               <GridImageCard
                 key={image.id}
@@ -684,6 +872,31 @@ export const ImageGrid: React.FC = () => {
           currentId={selectedImageId}
           onClose={() => setSelectedImageId(null)}
           onNavigate={setSelectedImageId}
+        />
+      )}
+
+      {detailImage && (
+        <ImageDetailsModal
+          image={detailImage}
+          tagNames={detailImageTagNames}
+          allTags={flattenedTags}
+          activeTagIds={detailImageTagIds}
+          onToggleTag={async (tagId) => {
+            if (!detailImage) return;
+            const active = detailImageTagIds.includes(tagId);
+            if (active) {
+              await removeImageTagRelation(detailImage.id, tagId);
+              pushNotification('已移除图片标签', 'info');
+            } else {
+              await addImageTagRelation(detailImage.id, tagId);
+              pushNotification('已添加图片标签', 'success');
+            }
+          }}
+          onDelete={async () => {
+            if (!detailImage) return;
+            await handleDelete(detailImage.id);
+          }}
+          onClose={() => setDetailImageId(null)}
         />
       )}
     </div>

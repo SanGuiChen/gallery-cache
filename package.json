@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "doctor": "node scripts/doctor.mjs",
+    "verify": "node scripts/verify.mjs",
+    "package:desktop": "node scripts/verify.mjs --package"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",

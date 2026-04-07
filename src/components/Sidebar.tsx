@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useAppStore } from '../stores/appStore';
-import type { Tag } from '../types';
+import { UNTAGGED_TAG_ID, type Tag } from '../types';
+
+interface TagContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
+  tagId: string | null;
+}
 
 interface TagItemProps {
   tag: Tag;
@@ -8,7 +15,7 @@ interface TagItemProps {
   selectedTagId: string | null;
   editingId: string | null;
   editingName: string;
-  newTagParentId: string | null;
+  newTagParentId: string | null | undefined;
   newTagName: string;
   getChildTags: (parentId: string) => Tag[];
   onSelect: (id: string | null) => void;
@@ -20,6 +27,8 @@ interface TagItemProps {
   onAddTag: (parentId: string | null) => void;
   onCancelAdd: () => void;
   onEditNameChangeForNew: (name: string) => void;
+  onMove: (id: string, direction: 'up' | 'down') => void;
+  onOpenContextMenu: (e: React.MouseEvent, tag: Tag) => void;
   dragOverTagId: string | null;
   onDragOver: (tagId: string) => void;
   onDragLeave: (tagId: string) => void;
@@ -44,6 +53,8 @@ const TagItem: React.FC<TagItemProps> = ({
   onAddTag,
   onCancelAdd,
   onEditNameChangeForNew,
+  onMove,
+  onOpenContextMenu,
   dragOverTagId,
   onDragOver,
   onDragLeave,
@@ -59,17 +70,18 @@ const TagItem: React.FC<TagItemProps> = ({
   return (
     <div className="select-none">
       <div
-        className={`
-          flex items-center gap-1.5 px-3 py-2 cursor-pointer
+      className={`
+          flex items-center gap-1.5 rounded-xl px-3 py-2 cursor-pointer
           transition-all duration-150 group
           ${isDragOver ? 'bg-[var(--color-accent)]/20 ring-1 ring-[var(--color-accent)] ring-inset' : ''}
-          ${isSelected ? 'bg-[#2a2a2a] border-l-[3px] border-[var(--color-accent)]' : 'border-l-[3px] border-transparent hover:bg-[#2a2a2a]'}
+          ${isSelected ? 'bg-[rgba(99,102,241,0.16)] text-white' : 'hover:bg-[rgba(255,255,255,0.04)]'}
         `}
         style={{ paddingLeft: `${12 + level * 16}px` }}
         onClick={() => onSelect(isSelected ? null : tag.id)}
         onContextMenu={(e) => {
           e.preventDefault();
           if (!isSelected) onSelect(tag.id);
+          onOpenContextMenu(e, tag);
         }}
         onDragOver={(e) => { e.preventDefault(); onDragOver(tag.id); }}
         onDragLeave={(e) => { e.preventDefault(); onDragLeave(tag.id); }}
@@ -125,6 +137,26 @@ const TagItem: React.FC<TagItemProps> = ({
 
         {/* Action buttons */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMove(tag.id, 'up');
+            }}
+            className="w-5 h-5 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-[10px]"
+            title="上移"
+          >
+            ↑
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMove(tag.id, 'down');
+            }}
+            className="w-5 h-5 flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-[10px]"
+            title="下移"
+          >
+            ↓
+          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -206,6 +238,8 @@ const TagItem: React.FC<TagItemProps> = ({
               onAddTag={onAddTag}
               onCancelAdd={onCancelAdd}
               onEditNameChangeForNew={onEditNameChangeForNew}
+              onMove={onMove}
+              onOpenContextMenu={onOpenContextMenu}
               dragOverTagId={dragOverTagId}
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
@@ -219,24 +253,25 @@ const TagItem: React.FC<TagItemProps> = ({
 };
 
 export const Sidebar: React.FC = () => {
-  const {
-    config,
-    tags,
-    selectedTagId,
-    selectDataPath,
-    setSelectedTagId,
-    addTag,
-    updateTag,
-    deleteTag,
-    addImageTagRelation,
-    draggingImageId,
-  } = useAppStore();
+  const config = useAppStore(state => state.config);
+  const tags = useAppStore(state => state.tags);
+  const selectedTagId = useAppStore(state => state.selectedTagId);
+  const selectDataPath = useAppStore(state => state.selectDataPath);
+  const setSelectedTagId = useAppStore(state => state.setSelectedTagId);
+  const addTag = useAppStore(state => state.addTag);
+  const updateTag = useAppStore(state => state.updateTag);
+  const deleteTag = useAppStore(state => state.deleteTag);
+  const moveTag = useAppStore(state => state.moveTag);
+  const addImageTagRelation = useAppStore(state => state.addImageTagRelation);
+  const clearImageTagRelations = useAppStore(state => state.clearImageTagRelations);
+  const draggingImageId = useAppStore(state => state.draggingImageId);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
-  const [newTagParentId, setNewTagParentId] = useState<string | null>(null);
+  const [newTagParentId, setNewTagParentId] = useState<string | null | undefined>(undefined);
   const [newTagName, setNewTagName] = useState('');
   const [dragOverTagId, setDragOverTagId] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<TagContextMenuState>({ visible: false, x: 0, y: 0, tagId: null });
 
   const rootTags = tags.filter(t => t.parentId === null).sort((a, b) => a.order - b.order);
   const getChildTags = (parentId: string) =>
@@ -259,11 +294,12 @@ export const Sidebar: React.FC = () => {
     if (newTagName.trim()) {
       await addTag(newTagName.trim(), parentId);
       setNewTagName('');
-      setNewTagParentId(null);
+      setNewTagParentId(undefined);
     }
   };
 
   const handleDeleteTag = async (id: string) => {
+    setContextMenu({ visible: false, x: 0, y: 0, tagId: null });
     if (confirm('确定要删除这个标签吗？\n\n注意：图片会变为未分类状态，但不会被删除。')) {
       await deleteTag(id);
       if (selectedTagId === id || selectedTagId === null) {
@@ -271,6 +307,34 @@ export const Sidebar: React.FC = () => {
       }
     }
   };
+
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, tagId: null });
+  };
+
+  const handleOpenContextMenu = (e: React.MouseEvent, tag: Tag) => {
+    const menuX = Math.min(e.clientX, window.innerWidth - 220);
+    const menuY = Math.min(e.clientY, window.innerHeight - 220);
+    setContextMenu({ visible: true, x: menuX, y: menuY, tagId: tag.id });
+  };
+
+  const handleMoveTag = async (id: string, direction: 'up' | 'down') => {
+    closeContextMenu();
+    await moveTag(id, direction);
+  };
+
+  const contextTag = contextMenu.tagId ? tags.find(tag => tag.id === contextMenu.tagId) ?? null : null;
+
+  React.useEffect(() => {
+    if (!contextMenu.visible) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeContextMenu();
+      }
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [contextMenu.visible]);
 
   // Drag-to-tag handlers
   const handleDragOver = (tagId: string) => {
@@ -290,14 +354,15 @@ export const Sidebar: React.FC = () => {
 
   return (
     <div
-      className="h-full w-[280px] bg-[var(--color-bg-secondary)] flex flex-col border-r border-[var(--color-border)]"
+      className="h-full w-[296px] bg-[rgba(26,28,32,0.92)] flex flex-col border-r border-[rgba(255,255,255,0.06)] backdrop-blur-xl"
       onDragOver={(e) => { if (draggingImageId) { e.preventDefault(); } }}
       onDrop={(e) => { if (draggingImageId) { e.preventDefault(); e.stopPropagation(); } }}
+      onClick={() => closeContextMenu()}
     >
       {/* Header */}
-      <div className="p-4 border-b border-[var(--color-border)]">
+      <div className="p-5 border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider font-medium">
+          <span className="text-[11px] text-[var(--color-text-secondary)] uppercase tracking-[0.22em] font-medium">
             数据目录
           </span>
           <button
@@ -308,7 +373,7 @@ export const Sidebar: React.FC = () => {
           </button>
         </div>
         <div
-          className="font-mono text-xs text-[var(--color-text-secondary)] truncate bg-[var(--color-bg-card)] px-2 py-1.5 rounded"
+          className="font-mono text-xs text-[var(--color-text-secondary)] truncate rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.035)] px-3 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]"
           title={config?.dataPath}
         >
           {config?.dataPath || '未设置'}
@@ -319,11 +384,14 @@ export const Sidebar: React.FC = () => {
       <div className="flex-1 overflow-y-auto">
         <div className="p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-[var(--color-text-secondary)] uppercase tracking-wider font-medium">
+            <span className="text-[11px] text-[var(--color-text-secondary)] uppercase tracking-[0.22em] font-medium">
               标签分类
             </span>
             <button
-              onClick={() => setNewTagParentId(null)}
+              onClick={() => {
+                setNewTagParentId(null);
+                setNewTagName('');
+              }}
               className="w-6 h-6 flex items-center justify-center text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] hover:bg-[var(--color-accent)]/10 rounded transition-colors"
               title="添加一级标签"
             >
@@ -334,9 +402,9 @@ export const Sidebar: React.FC = () => {
           {/* All images option */}
           <div
             className={`
-              flex items-center gap-2 px-3 py-2 cursor-pointer mb-1 rounded-md
+              mb-1 flex items-center gap-2 rounded-2xl px-3 py-2.5 cursor-pointer
               transition-all duration-150
-              ${selectedTagId === null ? 'bg-[#2a2a2a] border-l-[3px] border-[var(--color-accent)]' : 'border-l-[3px] border-transparent hover:bg-[#2a2a2a]'}
+              ${selectedTagId === null ? 'bg-[rgba(91,140,255,0.16)] text-white shadow-[0_0_0_1px_rgba(91,140,255,0.16)_inset]' : 'hover:bg-[rgba(255,255,255,0.04)]'}
             `}
             onClick={() => setSelectedTagId(null)}
             onDragOver={(e) => { e.preventDefault(); setDragOverTagId('__all__'); }}
@@ -345,11 +413,24 @@ export const Sidebar: React.FC = () => {
               setDragOverTagId(null);
               if (draggingImageId) {
                 e.preventDefault();
+                void clearImageTagRelations(draggingImageId);
               }
             }}
           >
             <span className="text-sm">🖼️</span>
             <span className="text-sm text-[var(--color-text-primary)]">全部图片</span>
+          </div>
+
+          <div
+            className={`
+              mb-2 flex items-center gap-2 rounded-2xl px-3 py-2.5 cursor-pointer
+              transition-all duration-150
+              ${selectedTagId === UNTAGGED_TAG_ID ? 'bg-[rgba(91,140,255,0.16)] text-white shadow-[0_0_0_1px_rgba(91,140,255,0.16)_inset]' : 'hover:bg-[rgba(255,255,255,0.04)]'}
+            `}
+            onClick={() => setSelectedTagId(UNTAGGED_TAG_ID)}
+          >
+            <span className="text-sm">🗂️</span>
+            <span className="text-sm text-[var(--color-text-primary)]">未分类</span>
           </div>
 
           {/* Add root tag input */}
@@ -362,7 +443,7 @@ export const Sidebar: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAddTag(null);
                   if (e.key === 'Escape') {
-                    setNewTagParentId(null);
+                    setNewTagParentId(undefined);
                     setNewTagName('');
                   }
                 }}
@@ -378,7 +459,7 @@ export const Sidebar: React.FC = () => {
               </button>
               <button
                 onClick={() => {
-                  setNewTagParentId(null);
+                  setNewTagParentId(undefined);
                   setNewTagName('');
                 }}
                 className="px-2 py-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] rounded text-sm"
@@ -408,10 +489,12 @@ export const Sidebar: React.FC = () => {
               onAddChild={setNewTagParentId}
               onAddTag={handleAddTag}
               onCancelAdd={() => {
-                setNewTagParentId(null);
+                setNewTagParentId(undefined);
                 setNewTagName('');
               }}
               onEditNameChangeForNew={setNewTagName}
+              onMove={handleMoveTag}
+              onOpenContextMenu={handleOpenContextMenu}
               dragOverTagId={dragOverTagId}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -419,7 +502,7 @@ export const Sidebar: React.FC = () => {
             />
           ))}
 
-          {rootTags.length === 0 && newTagParentId === null && (
+          {rootTags.length === 0 && newTagParentId === undefined && (
             <div className="text-center py-8 text-[var(--color-text-disabled)] text-sm">
               <div className="text-3xl mb-2">📂</div>
               <div>暂无标签</div>
@@ -429,8 +512,55 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
 
+      {contextTag && contextMenu.visible && (
+        <div
+          className="fixed z-50 min-w-[180px] rounded-xl border border-[rgba(255,255,255,0.08)] bg-[var(--color-bg-card)] py-1 shadow-xl"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => {
+              closeContextMenu();
+              handleStartEdit(contextTag);
+            }}
+            className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)]"
+          >
+            重命名
+          </button>
+          <button
+            onClick={() => {
+              closeContextMenu();
+              setNewTagParentId(contextTag.id);
+              setNewTagName('');
+            }}
+            className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)]"
+          >
+            添加子标签
+          </button>
+          <button
+            onClick={() => void handleMoveTag(contextTag.id, 'up')}
+            className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)]"
+          >
+            上移
+          </button>
+          <button
+            onClick={() => void handleMoveTag(contextTag.id, 'down')}
+            className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)]"
+          >
+            下移
+          </button>
+          <div className="my-1 h-px bg-[var(--color-border)]" />
+          <button
+            onClick={() => void handleDeleteTag(contextTag.id)}
+            className="w-full px-4 py-2 text-left text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-secondary)]"
+          >
+            删除
+          </button>
+        </div>
+      )}
+
       {/* Footer */}
-      <div className="p-3 border-t border-[var(--color-border)] text-center">
+      <div className="p-4 border-t border-[rgba(255,255,255,0.06)] text-center">
         <span className="text-[10px] text-[var(--color-text-disabled)]">
           Gallery Cache v0.1.0
         </span>

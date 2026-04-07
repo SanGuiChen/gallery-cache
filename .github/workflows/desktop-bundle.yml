@@ -1,0 +1,57 @@
+name: Desktop Bundle
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            artifact_name: gallery-cache-macos
+            artifact_path_1: src-tauri/target/release/bundle/macos
+            artifact_path_2: src-tauri/target/release/bundle/dmg
+          - os: windows-latest
+            artifact_name: gallery-cache-windows
+            artifact_path_1: src-tauri/target/release/bundle/nsis
+            artifact_path_2: src-tauri/target/release/bundle/msi
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop bundle
+        run: npm run tauri build
+
+      - name: Upload bundle artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          if-no-files-found: warn
+          path: |
+            ${{ matrix.artifact_path_1 }}
+            ${{ matrix.artifact_path_2 }}

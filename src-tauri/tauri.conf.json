@@ -19,10 +19,20 @@
         "minWidth": 800,
         "minHeight": 600,
         "center": true,
-        "resizable": true
+        "resizable": true,
+        "theme": "Dark",
+        "backgroundColor": "#1a1a1a"
       }
     ],
     "security": {
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": [
+            "**"
+          ]
+        }
+      },
       "csp": null
     }
   },

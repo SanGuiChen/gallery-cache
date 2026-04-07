@@ -1,12 +1,14 @@
+export const UNTAGGED_TAG_ID = '__untagged__';
+
 export interface ImageInfo {
   id: string;
   filename: string;
-  original_name: string;
+  originalName: string;
   width: number;
   height: number;
   size: number;
-  created_at: number;
-  imported_at: number;
+  createdAt: number;
+  importedAt: number;
   source: 'paste' | 'cdn' | 'file';
 }
 
