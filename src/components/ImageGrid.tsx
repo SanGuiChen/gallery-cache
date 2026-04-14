@@ -4,6 +4,10 @@ import { convertFileSrc } from '@tauri-apps/api/core';
 import { writeImage } from '@tauri-apps/plugin-clipboard-manager';
 import Masonry from 'react-masonry-css';
 import { UNTAGGED_TAG_ID, type ImageInfo } from '../types';
+<<<<<<< HEAD
+=======
+import { IconCameraEmpty } from './icons/DeskIcons';
+>>>>>>> 57eddd3 (Initial commit)
 
 const CARD_GAP = 20;
 const IMAGE_FILE_PATTERN = /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i;
@@ -27,18 +31,27 @@ interface ImageDetailsProps {
 
 interface ImageCardProps {
   image: ImageInfo;
+<<<<<<< HEAD
   onDelete: (id: string) => void;
   onAddTag: (imageId: string) => void;
+=======
+>>>>>>> 57eddd3 (Initial commit)
   onClick: (id: string) => void;
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   onDragStart: (e: React.DragEvent, image: ImageInfo) => void;
   onDragEnd: () => void;
 }
 
+<<<<<<< HEAD
 const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAddTag, onClick, onContextMenu, onDragStart, onDragEnd }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [showActions, setShowActions] = useState(false);
+=======
+const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onClick, onContextMenu, onDragStart, onDragEnd }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+>>>>>>> 57eddd3 (Initial commit)
   const getImagePath = useAppStore(state => state.getImagePath);
   const [imageSrc, setImageSrc] = useState<string>('');
 
@@ -51,8 +64,11 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
   return (
     <div
       className="group cursor-pointer select-none"
+<<<<<<< HEAD
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
+=======
+>>>>>>> 57eddd3 (Initial commit)
       style={{ marginBottom: CARD_GAP }}
       onClick={() => onClick(image.id)}
       onContextMenu={(e) => onContextMenu(e, image.id)}
@@ -66,7 +82,11 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
       )}
 
       {error && (
+<<<<<<< HEAD
         <div className="flex min-h-64 items-center justify-center rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] text-[var(--color-text-secondary)] py-8">
+=======
+        <div className="flex min-h-64 items-center justify-center rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] py-8">
+>>>>>>> 57eddd3 (Initial commit)
           <div className="text-center">
             <div className="text-2xl mb-2">⚠️</div>
             <div className="text-xs">加载失败</div>
@@ -75,7 +95,11 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
       )}
 
       {imageSrc && (
+<<<<<<< HEAD
         <div className="relative overflow-hidden rounded-[24px] border border-[rgba(255,255,255,0.06)] bg-[#1b1d21] shadow-[0_18px_40px_rgba(0,0,0,0.18)] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-[rgba(255,255,255,0.12)] group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.24)]">
+=======
+        <div className="relative overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] shadow-sm transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-[#d8d8d8] group-hover:shadow-md">
+>>>>>>> 57eddd3 (Initial commit)
           <img
             src={imageSrc}
             alt={image.originalName || image.filename}
@@ -88,6 +112,7 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
             loading="lazy"
             draggable={false}
           />
+<<<<<<< HEAD
           <div
             className={`absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 p-4 transition-opacity duration-200 ${showActions ? 'opacity-100' : 'opacity-0'} bg-gradient-to-t from-black/78 via-black/16 to-transparent`}
           >
@@ -110,12 +135,18 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
               删除
             </button>
           </div>
+=======
+>>>>>>> 57eddd3 (Initial commit)
         </div>
       )}
 
       {!error && (
         <div className="flex items-start justify-between gap-3 px-1.5 pt-3">
+<<<<<<< HEAD
           <div className="min-w-0">
+=======
+          <div className="min-w-0 flex-1">
+>>>>>>> 57eddd3 (Initial commit)
             <div className="truncate text-[13px] font-medium text-[var(--color-text-primary)]">
               {image.originalName || image.filename}
             </div>
@@ -123,7 +154,11 @@ const ImageCard: React.FC<ImageCardProps> = React.memo(({ image, onDelete, onAdd
               {image.source === 'cdn' ? 'CDN 导入' : image.source === 'paste' ? '粘贴导入' : '本地导入'}
             </div>
           </div>
+<<<<<<< HEAD
           <span className="shrink-0 rounded-full border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] px-2 py-1 text-[10px] text-[var(--color-text-secondary)]">
+=======
+          <span className="shrink-0 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-page)] px-2 py-1 text-[10px] text-[var(--color-text-secondary)]">
+>>>>>>> 57eddd3 (Initial commit)
             {image.width}×{image.height}
           </span>
         </div>
@@ -137,15 +172,22 @@ ImageCard.displayName = 'ImageCard';
 // Grid view card (fixed aspect ratio)
 interface GridImageCardProps {
   image: ImageInfo;
+<<<<<<< HEAD
   onDelete: (id: string) => void;
   onAddTag: (imageId: string) => void;
+=======
+>>>>>>> 57eddd3 (Initial commit)
   onClick: (id: string) => void;
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   onDragStart: (e: React.DragEvent, image: ImageInfo) => void;
   onDragEnd: () => void;
 }
 
+<<<<<<< HEAD
 const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onDelete, onAddTag, onClick, onContextMenu, onDragStart, onDragEnd }) => {
+=======
+const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onClick, onContextMenu, onDragStart, onDragEnd }) => {
+>>>>>>> 57eddd3 (Initial commit)
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const getImagePath = useAppStore(state => state.getImagePath);
@@ -159,7 +201,11 @@ const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onDelet
 
   return (
     <div
+<<<<<<< HEAD
       className="relative group overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.05)] bg-[var(--color-bg-card)] cursor-pointer transition-colors duration-200 hover:bg-[#333333] aspect-square"
+=======
+      className="relative aspect-square cursor-pointer overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-page)] shadow-sm transition-colors duration-200 hover:border-[#d8d8d8] hover:shadow-md"
+>>>>>>> 57eddd3 (Initial commit)
       onClick={() => onClick(image.id)}
       onContextMenu={(e) => onContextMenu(e, image.id)}
       draggable
@@ -191,6 +237,7 @@ const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onDelet
           draggable={false}
         />
       )}
+<<<<<<< HEAD
       <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)] opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
         <div className="flex gap-1 w-full justify-end">
           <button
@@ -207,6 +254,8 @@ const GridImageCard: React.FC<GridImageCardProps> = React.memo(({ image, onDelet
           </button>
         </div>
       </div>
+=======
+>>>>>>> 57eddd3 (Initial commit)
     </div>
   );
 });
@@ -298,11 +347,19 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
 
   return (
     <div
+<<<<<<< HEAD
       className="fixed inset-0 z-50 flex flex-col bg-[#101010]"
       onClick={onClose}
     >
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-[rgba(16,16,16,0.92)] border-b border-[rgba(255,255,255,0.08)]">
+=======
+      className="fixed inset-0 z-50 flex flex-col bg-[rgba(16,22,36,0.96)]"
+      onClick={onClose}
+    >
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-[rgba(20,26,42,0.82)] border-b border-[rgba(255,255,255,0.16)] backdrop-blur-xl">
+>>>>>>> 57eddd3 (Initial commit)
         <div className="text-white text-sm">
           {currentIndex + 1} / {images.length}
         </div>
@@ -338,7 +395,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
       </div>
 
       {/* Image info */}
+<<<<<<< HEAD
       <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-[rgba(16,16,16,0.92)] border-t border-[rgba(255,255,255,0.08)]">
+=======
+      <div className="absolute bottom-0 left-0 right-0 z-10 p-4 bg-[rgba(20,26,42,0.82)] border-t border-[rgba(255,255,255,0.16)] backdrop-blur-xl">
+>>>>>>> 57eddd3 (Initial commit)
         <div className="flex items-center justify-between text-white text-xs">
           <div>
             {currentImage.originalName && (
@@ -403,7 +464,11 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ images, currentId, onClose, o
       </div>
 
       {/* Help hint */}
+<<<<<<< HEAD
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 rounded-full px-3 py-1 text-xs text-gray-400 bg-[rgba(16,16,16,0.92)] border border-[rgba(255,255,255,0.08)]">
+=======
+      <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 rounded-full px-3 py-1 text-xs text-gray-300 bg-[rgba(20,26,42,0.82)] border border-[rgba(255,255,255,0.16)] backdrop-blur-xl">
+>>>>>>> 57eddd3 (Initial commit)
         ← → 导航 | 滚轮缩放 | ESC 关闭
       </div>
     </div>
@@ -419,6 +484,7 @@ const ImageDetailsModal: React.FC<ImageDetailsProps> = ({
   onDelete,
   onClose,
 }) => {
+<<<<<<< HEAD
   const details = [
     ['原始名称', image.originalName || '未记录'],
     ['文件名', image.filename],
@@ -433,6 +499,12 @@ const ImageDetailsModal: React.FC<ImageDetailsProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-[rgba(16,16,16,0.82)]" onClick={onClose}>
       <div
         className="w-full max-w-lg rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)]"
+=======
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-[rgba(16,16,16,0.82)]" onClick={onClose}>
+      <div
+        className="w-full max-w-lg rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-page)] shadow-xl"
+>>>>>>> 57eddd3 (Initial commit)
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-4">
@@ -449,12 +521,43 @@ const ImageDetailsModal: React.FC<ImageDetailsProps> = ({
         </div>
 
         <div className="space-y-3 px-5 py-4">
+<<<<<<< HEAD
           {details.map(([label, value]) => (
             <div key={label} className="grid grid-cols-[88px_1fr] gap-3 text-sm">
               <span className="text-[var(--color-text-secondary)]">{label}</span>
               <span className="break-all text-[var(--color-text-primary)]">{value}</span>
             </div>
           ))}
+=======
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">原始名称</span>
+            <span className="break-all text-[var(--color-text-primary)]">{image.originalName || '未记录'}</span>
+          </div>
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">文件名</span>
+            <span className="break-all text-[var(--color-text-primary)]">{image.filename}</span>
+          </div>
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">分辨率</span>
+            <span className="break-all text-[var(--color-text-primary)]">{image.width} × {image.height}</span>
+          </div>
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">大小</span>
+            <span className="break-all text-[var(--color-text-primary)]">{formatFileSize(image.size)}</span>
+          </div>
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">来源</span>
+            <span className="break-all text-[var(--color-text-primary)]">{image.source === 'paste' ? '粘贴' : image.source === 'cdn' ? 'CDN' : '本地文件'}</span>
+          </div>
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">导入时间</span>
+            <span className="break-all text-[var(--color-text-primary)]">{new Date(image.importedAt).toLocaleString()}</span>
+          </div>
+          <div className="grid grid-cols-[88px_1fr] gap-3 text-sm">
+            <span className="text-[var(--color-text-secondary)]">标签</span>
+            <span className="break-all text-[var(--color-text-primary)]">{tagNames.length > 0 ? tagNames.join(' / ') : '未分类'}</span>
+          </div>
+>>>>>>> 57eddd3 (Initial commit)
 
           <div className="pt-2">
             <div className="mb-2 text-xs uppercase tracking-wider text-[var(--color-text-secondary)]">
@@ -505,12 +608,98 @@ function formatFileSize(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
+<<<<<<< HEAD
+=======
+// Rename Modal
+interface RenameModalProps {
+  image: ImageInfo;
+  onRename: (imageId: string, newName: string) => Promise<void>;
+  onClose: () => void;
+}
+
+const RenameModal: React.FC<RenameModalProps> = ({ image, onRename, onClose }) => {
+  const [editName, setEditName] = useState(image.originalName || '');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, []);
+
+  const handleSave = async () => {
+    const newName = editName.trim();
+    if (newName && newName !== image.originalName) {
+      await onRename(image.id, newName);
+    }
+    onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-[rgba(16,16,16,0.82)]" onClick={onClose}>
+      <div
+        className="w-full max-w-sm rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-page)] shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-[var(--color-border)] px-5 py-4">
+          <h3 className="text-base font-semibold text-[var(--color-text-primary)]">重命名图片</h3>
+          <button
+            className="text-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            onClick={onClose}
+          >
+            ✕
+          </button>
+        </div>
+        <div className="p-5">
+          <input
+            ref={inputRef}
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent)]"
+            placeholder="请输入新的图片名称"
+          />
+        </div>
+        <div className="flex justify-end gap-2 border-t border-[var(--color-border)] px-5 py-4">
+          <button
+            onClick={onClose}
+            className="rounded-lg border border-[var(--color-border)] px-4 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)]"
+          >
+            取消
+          </button>
+          <button
+            onClick={handleSave}
+            className="rounded-lg bg-[var(--color-accent)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-accent-hover)]"
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+>>>>>>> 57eddd3 (Initial commit)
 // Main ImageGrid with drag-drop, context menu, view modes
 export const ImageGrid: React.FC = () => {
   const getFilteredImages = useAppStore(state => state.getFilteredImages);
   const deleteImage = useAppStore(state => state.deleteImage);
   const addImageTagRelation = useAppStore(state => state.addImageTagRelation);
   const removeImageTagRelation = useAppStore(state => state.removeImageTagRelation);
+<<<<<<< HEAD
+=======
+  const updateImageName = useAppStore(state => state.updateImageName);
+>>>>>>> 57eddd3 (Initial commit)
   const relations = useAppStore(state => state.relations);
   const tags = useAppStore(state => state.tags);
   const saveImageFromFile = useAppStore(state => state.saveImageFromFile);
@@ -522,6 +711,10 @@ export const ImageGrid: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const [detailImageId, setDetailImageId] = useState<string | null>(null);
+<<<<<<< HEAD
+=======
+  const [renameImageId, setRenameImageId] = useState<string | null>(null);
+>>>>>>> 57eddd3 (Initial commit)
   const [showTagSelector, setShowTagSelector] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({ visible: false, x: 0, y: 0, imageId: null });
@@ -541,10 +734,13 @@ export const ImageGrid: React.FC = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleAddTag = (imageId: string) => {
     setShowTagSelector(imageId);
   };
 
+=======
+>>>>>>> 57eddd3 (Initial commit)
   const handleSelectTag = async (tagId: string) => {
     if (showTagSelector) {
       const hasRelation = relations.some(relation => relation.imageId === showTagSelector && relation.tagId === tagId);
@@ -598,6 +794,14 @@ export const ImageGrid: React.FC = () => {
     await handleDelete(imageId);
   };
 
+<<<<<<< HEAD
+=======
+  const handleContextRename = (imageId: string) => {
+    closeContextMenu();
+    setRenameImageId(imageId);
+  };
+
+>>>>>>> 57eddd3 (Initial commit)
   // Close context menu on click outside or escape
   useEffect(() => {
     if (!contextMenu.visible) return;
@@ -732,7 +936,11 @@ export const ImageGrid: React.FC = () => {
       {/* Tag selector dropdown */}
       {showTagSelector && (
         <div
+<<<<<<< HEAD
           className="absolute top-4 right-4 z-40 w-56 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] p-2"
+=======
+          className="absolute top-4 right-4 z-40 w-56 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] p-2 shadow-md"
+>>>>>>> 57eddd3 (Initial commit)
           onClick={(e) => e.stopPropagation()}
         >
           <div className="text-xs text-[var(--color-text-secondary)] px-2 py-1 mb-1">
@@ -757,7 +965,11 @@ export const ImageGrid: React.FC = () => {
       {/* Context menu */}
       {contextMenu.visible && (
         <div
+<<<<<<< HEAD
           className="fixed z-50 min-w-[160px] rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] py-1"
+=======
+          className="fixed z-50 min-w-[160px] rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] py-1 shadow-lg"
+>>>>>>> 57eddd3 (Initial commit)
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -779,6 +991,15 @@ export const ImageGrid: React.FC = () => {
           >
             <span>📋</span> 复制图片
           </button>
+<<<<<<< HEAD
+=======
+          <button
+            onClick={() => contextMenu.imageId && handleContextRename(contextMenu.imageId)}
+            className="w-full text-left px-4 py-2 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] flex items-center gap-2"
+          >
+            <span>✏️</span> 重命名
+          </button>
+>>>>>>> 57eddd3 (Initial commit)
           <div className="h-px bg-[var(--color-border)] my-1" />
           <button
             onClick={() => contextMenu.imageId && handleContextDelete(contextMenu.imageId)}
@@ -792,7 +1013,11 @@ export const ImageGrid: React.FC = () => {
       {/* Grid */}
       <div
         ref={containerRef}
+<<<<<<< HEAD
         className={`flex-1 overflow-y-auto px-6 py-6 transition-colors ${isDragOver ? 'bg-[var(--color-accent)]/10' : ''}`}
+=======
+        className={`flex-1 overflow-y-auto bg-[var(--color-bg-page)] px-6 py-8 transition-colors ${isDragOver ? 'bg-[rgba(91,143,249,0.06)]' : ''}`}
+>>>>>>> 57eddd3 (Initial commit)
         onClick={() => {
           if (showTagSelector) {
             setShowTagSelector(null);
@@ -803,6 +1028,7 @@ export const ImageGrid: React.FC = () => {
         onDrop={handleDrop}
       >
         {images.length === 0 ? (
+<<<<<<< HEAD
           <div className="h-full flex items-center justify-center">
             <div className="text-center max-w-sm mx-auto px-4 py-12">
               <div className="w-20 h-20 mx-auto mb-6 bg-[var(--color-bg-secondary)] rounded-2xl flex items-center justify-center">
@@ -812,6 +1038,15 @@ export const ImageGrid: React.FC = () => {
                 {selectedTagId === UNTAGGED_TAG_ID ? '暂无未分类图片' : selectedTagId ? '该标签下没有图片' : '暂无图片'}
               </p>
               <p className="text-sm text-[var(--color-text-disabled)]">
+=======
+          <div className="flex h-full items-center justify-center">
+            <div className="flex flex-col items-center gap-1 px-4 text-center">
+              <IconCameraEmpty className="h-[90px] w-[90px] text-[#d0d4dc]" />
+              <p className="text-base font-bold text-[var(--color-text-secondary)]">
+                {selectedTagId === UNTAGGED_TAG_ID ? '暂无未分类图片' : selectedTagId ? '该标签下没有图片' : '暂无图片'}
+              </p>
+              <p className="text-sm text-[var(--color-text-secondary)]">
+>>>>>>> 57eddd3 (Initial commit)
                 粘贴图片 (Ctrl/Cmd + V) 或拖拽图片到此处
               </p>
             </div>
@@ -827,8 +1062,11 @@ export const ImageGrid: React.FC = () => {
                 <ImageCard
                   key={image.id}
                   image={image}
+<<<<<<< HEAD
                   onDelete={handleDelete}
                   onAddTag={handleAddTag}
+=======
+>>>>>>> 57eddd3 (Initial commit)
                   onClick={setSelectedImageId}
                   onContextMenu={handleContextMenu}
                   onDragStart={handleDragStart}
@@ -843,8 +1081,11 @@ export const ImageGrid: React.FC = () => {
               <GridImageCard
                 key={image.id}
                 image={image}
+<<<<<<< HEAD
                 onDelete={handleDelete}
                 onAddTag={handleAddTag}
+=======
+>>>>>>> 57eddd3 (Initial commit)
                 onClick={setSelectedImageId}
                 onContextMenu={handleContextMenu}
                 onDragStart={handleDragStart}
@@ -857,10 +1098,16 @@ export const ImageGrid: React.FC = () => {
 
       {/* Drop overlay */}
       {isDragOver && (
+<<<<<<< HEAD
         <div className="absolute inset-0 bg-[var(--color-accent)]/20 border-4 border-dashed border-[var(--color-accent)] rounded-lg flex items-center justify-center z-30 pointer-events-none">
           <div className="text-center">
             <div className="text-5xl mb-2 text-[var(--color-accent)]">📥</div>
             <div className="text-[var(--color-accent)] font-medium">释放以导入图片</div>
+=======
+        <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center rounded-lg border-2 border-dashed border-[var(--color-accent)] bg-[rgba(91,143,249,0.08)]">
+          <div className="text-center">
+            <p className="text-sm font-medium text-[var(--color-accent)]">释放以导入图片</p>
+>>>>>>> 57eddd3 (Initial commit)
           </div>
         </div>
       )}
@@ -899,6 +1146,24 @@ export const ImageGrid: React.FC = () => {
           onClose={() => setDetailImageId(null)}
         />
       )}
+<<<<<<< HEAD
+=======
+
+      {renameImageId && (() => {
+        const imageToRename = images.find(img => img.id === renameImageId);
+        if (!imageToRename) return null;
+        return (
+          <RenameModal
+            image={imageToRename}
+            onRename={async (imageId, newName) => {
+              await updateImageName(imageId, newName);
+              pushNotification('图片名称已修改', 'success');
+            }}
+            onClose={() => setRenameImageId(null)}
+          />
+        );
+      })()}
+>>>>>>> 57eddd3 (Initial commit)
     </div>
   );
 };

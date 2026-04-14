@@ -130,6 +130,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\setup-windows.ps1 -SkipInstal
 - [`desktop-bundle.yml`](./.github/workflows/desktop-bundle.yml)
   - 在 `workflow_dispatch` 或 `v*` tag push 时运行
   - 自动构建 macOS 和 Windows 桌面包
+<<<<<<< HEAD
   - macOS 产出 `.app + zip`，避免 GitHub Runner 上不稳定的 `.dmg` 打包步骤
   - 手动触发时上传构建产物到 GitHub Actions Artifacts
   - 推送 `v*` tag 时自动创建 GitHub Release 并挂载构建产物
@@ -138,11 +139,18 @@ powershell -ExecutionPolicy Bypass -File .\scripts\setup-windows.ps1 -SkipInstal
 
 手动试跑：
 
+=======
+  - 自动上传构建产物到 GitHub Actions Artifacts
+
+使用方式：
+
+>>>>>>> 57eddd3 (Initial commit)
 1. 把仓库推到 GitHub
 2. 打开 `Actions`
 3. 手动运行 `Desktop Bundle`
 4. 在运行结果里下载 artifacts
 
+<<<<<<< HEAD
 自动发布 Release：
 
 1. 本地创建版本 tag，例如 `v0.1.1`
@@ -158,6 +166,8 @@ git push origin v0.1.1
    - 创建或更新同名 Release
    - 把产物挂到 Release Assets
 
+=======
+>>>>>>> 57eddd3 (Initial commit)
 ## 项目结构
 
 前端：

@@ -6,6 +6,10 @@ import { Toolbar } from './components/Toolbar';
 import { ImageGrid } from './components/ImageGrid';
 import { UNTAGGED_TAG_ID } from './types';
 import { readImage, readText } from '@tauri-apps/plugin-clipboard-manager';
+<<<<<<< HEAD
+=======
+import { IconLogoMark } from './components/icons/DeskIcons';
+>>>>>>> 57eddd3 (Initial commit)
 
 const REMOTE_URL_PATTERN = /(?:https?:)?\/\/[^\s<>"')]+/gi;
 
@@ -161,7 +165,11 @@ function App() {
       <div className="h-full w-full flex items-center justify-center bg-[var(--color-bg-primary)]">
         <div className="text-center">
           <div className="w-10 h-10 mx-auto mb-4 rounded-full border-2 border-[var(--color-border)] border-t-[var(--color-accent)] animate-spin" />
+<<<<<<< HEAD
           <p className="text-sm text-[var(--color-text-secondary)]">正在加载 Gallery Cache...</p>
+=======
+          <p className="text-sm text-[var(--color-text-secondary)]">正在加载 idealib...</p>
+>>>>>>> 57eddd3 (Initial commit)
         </div>
       </div>
     );
@@ -171,6 +179,7 @@ function App() {
     return <WelcomeScreen />;
   }
 
+<<<<<<< HEAD
   return (
     <div className="relative h-full w-full overflow-hidden bg-[var(--color-bg-primary)]">
       <div className="pointer-events-none absolute inset-0 opacity-70">
@@ -189,20 +198,48 @@ function App() {
               Gallery Cache
             </span>
             <span className="block text-[10px] uppercase tracking-[0.28em] text-[var(--color-text-disabled)]">
+=======
+  const viewingLabel = selectedTagId
+    ? selectedTagId === UNTAGGED_TAG_ID
+      ? '未分类'
+      : tags.find(t => t.id === selectedTagId)?.name || '未知'
+    : '全部图片';
+  const viewLabel = viewMode === 'masonry' ? '瀑布流视图' : '网格视图';
+
+  return (
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[var(--color-bg-page)] text-[var(--color-text-primary)]">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-page)] px-6">
+        <div className="flex items-center gap-3">
+          <IconLogoMark className="h-8 w-8 text-[var(--color-text-primary)]" />
+          <div>
+            <span className="block text-[15px] font-semibold leading-tight text-[var(--color-text-primary)]">
+              idealib
+            </span>
+            <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--color-text-disabled)]">
+>>>>>>> 57eddd3 (Initial commit)
               Visual board
             </span>
           </div>
         </div>
+<<<<<<< HEAD
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
+=======
+      </header>
+
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <Sidebar />
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[var(--color-bg-page)]">
+>>>>>>> 57eddd3 (Initial commit)
           <Toolbar />
           <ImageGrid />
         </div>
       </div>
 
+<<<<<<< HEAD
       <div className="h-10 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(26,28,32,0.88)] backdrop-blur-xl flex items-center px-5 text-[11px] text-[var(--color-text-secondary)]">
         <span>总计 {images.length} 张</span>
         <span className="mx-2">|</span>
@@ -221,18 +258,38 @@ function App() {
         <span>Gallery Cache v0.1.0</span>
       </div>
       </div>
+=======
+      <footer className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-page)]">
+        <div className="px-5 pt-1.5 text-[10px] text-[var(--color-text-disabled)]">idealib v0.1.0</div>
+        <div className="flex h-9 items-center px-5 text-[11px] text-[var(--color-text-secondary)]">
+          <span>
+            总计: {images.length} | 当前: {filteredImages.length} | 当前查看: {viewingLabel}（{viewLabel}）| 路径:{' '}
+            <span className="text-[var(--color-text-disabled)]">{config?.dataPath ?? ''}</span>
+          </span>
+        </div>
+      </footer>
+>>>>>>> 57eddd3 (Initial commit)
 
       {notifications.length > 0 && (
         <div className="pointer-events-none fixed right-5 top-16 z-[60] flex w-80 flex-col gap-2">
           {notifications.map((notification) => (
             <button
               key={notification.id}
+<<<<<<< HEAD
               className={`pointer-events-auto rounded-2xl border px-4 py-3 text-left shadow-[0_14px_40px_rgba(0,0,0,0.28)] backdrop-blur-xl transition ${
                 notification.type === 'success'
                   ? 'border-emerald-500/30 bg-emerald-500/18 text-emerald-100'
                   : notification.type === 'error'
                     ? 'border-red-500/30 bg-red-500/18 text-red-100'
                     : 'border-[var(--color-border)] bg-[rgba(35,38,43,0.92)] text-[var(--color-text-primary)]'
+=======
+              className={`pointer-events-auto rounded-lg border px-4 py-3 text-left shadow-md transition ${
+                notification.type === 'success'
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                  : notification.type === 'error'
+                    ? 'border-red-200 bg-red-50 text-red-900'
+                    : 'border-[var(--color-border)] bg-[var(--color-bg-page)] text-[var(--color-text-primary)]'
+>>>>>>> 57eddd3 (Initial commit)
               }`}
               onClick={() => dismissNotification(notification.id)}
             >

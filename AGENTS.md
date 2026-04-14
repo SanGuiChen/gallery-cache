@@ -121,11 +121,14 @@ Windows 新手环境初始化：
 
 如果用户说“直接在 GitHub 上打包给我”，优先使用 `Desktop Bundle` 工作流，而不是要求用户本地打包。
 
+<<<<<<< HEAD
 发布约定：
 
 - 手动触发 `Desktop Bundle`：只产出 Actions artifacts
 - 推送 `v*` tag：自动创建或更新 GitHub Release，并上传产物
 
+=======
+>>>>>>> 57eddd3 (Initial commit)
 ## Standard Workflow
 
 1. 先复述用户目标
@@ -171,11 +174,14 @@ Windows 新手环境初始化：
 - macOS `.app` 和 `.zip` 是当前最稳定的交付产物
 - Windows 兼容性已经做过代码级收口，但若要 100% 确认，仍需要真实 Windows 机器黑盒验证
 
+<<<<<<< HEAD
 GitHub 打包约束：
 
 - CI / Release 工作流不要默认依赖 `.dmg`
 - GitHub 上的 macOS 产物以 `.app + zip` 为主
 
+=======
+>>>>>>> 57eddd3 (Initial commit)
 ## Acceptance Checklist
 
 改完后至少确认：

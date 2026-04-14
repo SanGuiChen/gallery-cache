@@ -1,0 +1,63 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "bg-primary": { "$type": "color", "$value": "#e8edf6" },
+    "bg-secondary": { "$type": "color", "$value": "#f4f7fc" },
+    "bg-card": { "$type": "color", "$value": "rgba(255, 255, 255, 0.68)" },
+    "bg-elevated": { "$type": "color", "$value": "rgba(255, 255, 255, 0.88)" },
+    "border": { "$type": "color", "$value": "rgba(132, 147, 176, 0.34)" },
+    "accent": { "$type": "color", "$value": "#4a79ff" },
+    "accent-hover": { "$type": "color", "$value": "#356bff" },
+    "text-primary": { "$type": "color", "$value": "#1c2434" },
+    "text-secondary": { "$type": "color", "$value": "#4d5b77" },
+    "text-disabled": { "$type": "color", "$value": "#7f8da9" },
+    "success": { "$type": "color", "$value": "#22c55e" },
+    "warning": { "$type": "color", "$value": "#f59e0b" },
+    "error": { "$type": "color", "$value": "#ef4444" },
+    "glow-accent-22": { "$type": "color", "$value": "rgba(74, 121, 255, 0.22)" },
+    "glow-accent-14": { "$type": "color", "$value": "rgba(74, 121, 255, 0.14)" },
+    "glow-accent-32": { "$type": "color", "$value": "rgba(74, 121, 255, 0.32)" },
+    "grid-line": { "$type": "color", "$value": "rgba(123, 145, 184, 0.22)" }
+  },
+  "dimension": {
+    "radius-sm": { "$type": "dimension", "$value": "4px" },
+    "radius-lg": { "$type": "dimension", "$value": "16px" },
+    "radius-xl": { "$type": "dimension", "$value": "18px" },
+    "radius-2xl": { "$type": "dimension", "$value": "24px" },
+    "space-3": { "$type": "dimension", "$value": "12px" },
+    "space-7": { "$type": "dimension", "$value": "28px" },
+    "space-8": { "$type": "dimension", "$value": "32px" },
+    "space-10": { "$type": "dimension", "$value": "40px" },
+    "space-15": { "$type": "dimension", "$value": "60px" },
+    "welcome-button-width": { "$type": "dimension", "$value": "300px" },
+    "welcome-logo-size": { "$type": "dimension", "$value": "96px" },
+    "welcome-title-button-gap": { "$type": "dimension", "$value": "240px" }
+  },
+  "fontFamily": {
+    "sans": {
+      "$type": "fontFamily",
+      "$value": ["SF Pro Text", "PingFang SC", "Avenir Next", "Hiragino Sans GB", "Microsoft YaHei", "sans-serif"]
+    },
+    "mono": {
+      "$type": "fontFamily",
+      "$value": ["JetBrains Mono", "SF Mono", "IBM Plex Mono", "Consolas", "monospace"]
+    }
+  },
+  "fontSize": {
+    "body": { "$type": "fontSize", "$value": "14px" },
+    "welcome-title": { "$type": "fontSize", "$value": "20px" }
+  },
+  "lineHeight": {
+    "body": { "$type": "number", "$value": 1.6 },
+    "caption": { "$type": "dimension", "$value": "28px" }
+  },
+  "letterSpacing": {
+    "body": { "$type": "dimension", "$value": "0.01em" },
+    "welcome-title": { "$type": "dimension", "$value": "0.02em" }
+  },
+  "shadow": {
+    "logo": { "$type": "shadow", "$value": { "color": "rgba(74, 121, 255, 0.32)", "offsetX": "0px", "offsetY": "24px", "blur": "64px", "spread": "0px" } },
+    "button-hover": { "$type": "shadow", "$value": { "color": "rgba(99, 102, 241, 0.28)", "offsetX": "0px", "offsetY": "12px", "blur": "32px", "spread": "0px" } },
+    "popover": { "$type": "shadow", "$value": { "color": "rgba(52, 73, 118, 0.2)", "offsetX": "0px", "offsetY": "22px", "blur": "56px", "spread": "0px" } }
+  }
+}

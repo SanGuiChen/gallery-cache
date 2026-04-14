@@ -7,6 +7,7 @@ export const WelcomeScreen: React.FC = () => {
   const initializationError = useAppStore(state => state.initializationError);
 
   return (
+<<<<<<< HEAD
     <div className="relative h-full w-full overflow-hidden bg-[var(--color-bg-primary)]">
       <div className="absolute left-1/2 top-[-120px] h-72 w-72 -translate-x-1/2 rounded-full bg-[var(--color-accent)]/18 blur-3xl" />
       <div className="absolute bottom-[-160px] right-[-80px] h-80 w-80 rounded-full bg-white/6 blur-3xl" />
@@ -71,6 +72,42 @@ export const WelcomeScreen: React.FC = () => {
               </p>
             )}
           </div>
+=======
+    <div className="relative h-full w-full overflow-hidden bg-[#f5f6f8]">
+      <div className="absolute left-1/2 top-[-120px] h-72 w-72 -translate-x-1/2 rounded-full bg-[var(--color-accent)]/22 blur-3xl" />
+      <div className="absolute bottom-[-160px] right-[-80px] h-80 w-80 rounded-full bg-[rgba(74,121,255,0.14)] blur-3xl" />
+      <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(rgba(123,145,184,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(123,145,184,0.22) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+      <div className="relative flex h-full w-full items-center justify-center px-6 py-10 sm:px-8 sm:py-14">
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+          <div className="mb-10 flex h-24 w-24 items-center justify-center rounded-[24px] border border-[rgba(74,121,255,0.2)] bg-[linear-gradient(135deg,#5f86ff_0%,#7e9cff_100%)] shadow-[0_24px_64px_rgba(74,121,255,0.32)]">
+            <span className="text-4xl">🖼️</span>
+          </div>
+
+          <h1 className="text-[20px] font-semibold tracking-[0.02em] text-[var(--color-text-primary)]">
+            灵感搜集库
+          </h1>
+
+          <div className="mt-60 flex w-full max-w-lg flex-col items-center gap-7">
+            <button
+              onClick={selectDataPath}
+              disabled={isInitializing}
+              className="w-[300px] rounded-2xl bg-[var(--color-accent)] px-8 py-4.5 text-white font-medium transition-all duration-200 hover:bg-[var(--color-accent-hover)] hover:shadow-[0_12px_32px_rgba(99,102,241,0.28)] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isInitializing ? '正在初始化目录...' : '选择图片存储文件夹'}
+            </button>
+
+            <div className="mt-3 text-sm leading-7 text-[var(--color-text-disabled)]">
+              建议选择一个专用目录，方便后续迁移、备份和长期整理
+            </div>
+          </div>
+
+          {initializationError && (
+            <p className="mt-8 text-sm text-[var(--color-error)]">
+              {initializationError}
+            </p>
+          )}
+>>>>>>> 57eddd3 (Initial commit)
         </div>
       </div>
     </div>

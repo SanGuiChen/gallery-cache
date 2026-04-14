@@ -255,6 +255,26 @@ fn save_images(data_path: String, images_data: ImagesData) -> Result<(), String>
 }
 
 #[tauri::command]
+<<<<<<< HEAD
+=======
+fn update_image_name(data_path: String, image_id: String, new_name: String) -> Result<(), String> {
+    let path = PathBuf::from(&data_path).join("metadata").join("images.json");
+    let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let mut images_data: ImagesData = serde_json::from_str(&content).map_err(|e| e.to_string())?;
+
+    for image in &mut images_data.images {
+        if image.id == image_id {
+            image.original_name = new_name;
+            break;
+        }
+    }
+
+    let content = serde_json::to_string_pretty(&images_data).map_err(|e| e.to_string())?;
+    fs::write(&path, content).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+>>>>>>> 57eddd3 (Initial commit)
 fn save_image_from_base64(
     data_path: String,
     base64_data: String,
@@ -404,6 +424,10 @@ pub fn run() {
             download_image,
             delete_image,
             get_image_path,
+<<<<<<< HEAD
+=======
+            update_image_name,
+>>>>>>> 57eddd3 (Initial commit)
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -505,3 +529,7 @@ mod tests {
         fs::remove_dir_all(temp_dir).unwrap();
     }
 }
+<<<<<<< HEAD
+=======
+ 
+>>>>>>> 57eddd3 (Initial commit)

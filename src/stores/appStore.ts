@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
+<<<<<<< HEAD
+=======
+import { readFile } from '@tauri-apps/plugin-fs';
+>>>>>>> 57eddd3 (Initial commit)
 import { UNTAGGED_TAG_ID, type AppConfig, type Tag, type ImageInfo, type ImageTagRelation } from '../types';
 
 type ViewMode = 'masonry' | 'grid';
@@ -42,6 +46,10 @@ interface AppState {
   updateTag: (id: string, name: string) => Promise<void>;
   deleteTag: (id: string) => Promise<void>;
   moveTag: (id: string, direction: 'up' | 'down') => Promise<void>;
+<<<<<<< HEAD
+=======
+  reorderTag: (dragTagId: string, dropTagId: string) => Promise<void>;
+>>>>>>> 57eddd3 (Initial commit)
 
   addImage: (image: ImageInfo) => Promise<void>;
   deleteImage: (id: string) => Promise<void>;
@@ -52,6 +60,11 @@ interface AppState {
   saveImageFromBase64: (base64Data: string, source: string) => Promise<ImageInfo>;
   saveImageFromFile: (file: File, source: 'paste' | 'file') => Promise<ImageInfo>;
   downloadImage: (url: string) => Promise<ImageInfo>;
+<<<<<<< HEAD
+=======
+  importImages: () => Promise<void>;
+  updateImageName: (imageId: string, newName: string) => Promise<void>;
+>>>>>>> 57eddd3 (Initial commit)
   getImagePath: (filename: string) => Promise<string>;
 
   getFilteredImages: () => ImageInfo[];
@@ -243,6 +256,41 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ tags: newTags });
   },
 
+<<<<<<< HEAD
+=======
+  reorderTag: async (dragTagId, dropTagId) => {
+    const { config, tags } = get();
+    if (!config) return;
+
+    const dragTag = tags.find(tag => tag.id === dragTagId);
+    const dropTag = tags.find(tag => tag.id === dropTagId);
+    if (!dragTag || !dropTag) return;
+    if (dragTag.parentId !== dropTag.parentId) return; // Can only reorder within same parent
+
+    const siblings = tags
+      .filter(tag => tag.parentId === dragTag.parentId)
+      .sort((a, b) => a.order - b.order);
+
+    const dragIndex = siblings.findIndex(tag => tag.id === dragTagId);
+    const dropIndex = siblings.findIndex(tag => tag.id === dropTagId);
+
+    if (dragIndex === -1 || dropIndex === -1) return;
+
+    // Move dragTag to dropIndex position
+    const reordered = [...siblings];
+    reordered.splice(dragIndex, 1);
+    reordered.splice(dropIndex, 0, dragTag);
+
+    const nextOrders = new Map(reordered.map((tag, index) => [tag.id, index]));
+    const newTags = tags.map(tag =>
+      nextOrders.has(tag.id) ? { ...tag, order: nextOrders.get(tag.id)! } : tag
+    );
+
+    await invoke('save_tags', { dataPath: config.dataPath, tagsData: { tags: newTags } });
+    set({ tags: newTags });
+  },
+
+>>>>>>> 57eddd3 (Initial commit)
   addImage: async (image) => {
     const { config, images, selectedTagId } = get();
     if (!config) return;
@@ -361,6 +409,63 @@ export const useAppStore = create<AppState>((set, get) => ({
     return image;
   },
 
+<<<<<<< HEAD
+=======
+  importImages: async () => {
+    const { config, saveImageFromBase64 } = get();
+    if (!config) throw new Error('Not initialized');
+
+    const selected = await open({
+      multiple: true,
+      filters: [{
+        name: 'Images',
+        extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'],
+      }],
+    });
+
+    if (!selected) return;
+
+    const filePaths = Array.isArray(selected) ? selected : [selected];
+    const failures: string[] = [];
+
+    for (const filePath of filePaths) {
+      try {
+        const contents = await readFile(filePath);
+        const base64 = btoa(String.fromCharCode(...contents));
+        const ext = filePath.split('.').pop()?.toLowerCase() || 'png';
+        const mimeType = ext === 'jpg' ? 'image/jpeg' : `image/${ext}`;
+        const dataUrl = `data:${mimeType};base64,${base64}`;
+        await saveImageFromBase64(dataUrl, 'file');
+      } catch (err) {
+        console.error('Failed to import:', filePath, err);
+        failures.push(filePath);
+      }
+    }
+
+    if (failures.length === 0) {
+      get().pushNotification(`成功导入 ${filePaths.length} 张图片`, 'success');
+    } else {
+      get().pushNotification(`导入完成，失败 ${failures.length} 张`, 'error');
+    }
+  },
+
+  updateImageName: async (imageId, newName) => {
+    const { config, images } = get();
+    if (!config) throw new Error('Not initialized');
+
+    await invoke('update_image_name', {
+      dataPath: config.dataPath,
+      imageId,
+      newName,
+    });
+
+    const newImages = images.map(img =>
+      img.id === imageId ? { ...img, originalName: newName } : img
+    );
+    set({ images: newImages });
+  },
+
+>>>>>>> 57eddd3 (Initial commit)
   getImagePath: async (filename) => {
     const { config } = get();
     if (!config) throw new Error('Not initialized');

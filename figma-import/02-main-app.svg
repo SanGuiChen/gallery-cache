@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <linearGradient id="mlg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="0.24" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="mrg1" cx="0" cy="0" r="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#4a79ff" stop-opacity="0.16"/>
+      <stop offset="0.36" stop-color="#4a79ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mrg2" cx="1" cy="1" r="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#678cff" stop-opacity="0.1"/>
+      <stop offset="0.3" stop-color="#678cff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1440" height="900" fill="#e8edf6"/>
+  <rect width="1440" height="900" fill="url(#mrg1)"/>
+  <rect width="1440" height="900" fill="url(#mrg2)"/>
+  <rect width="1440" height="900" fill="url(#mlg)"/>
+  <rect x="0" y="0" width="1440" height="56" fill="#ffffff" fill-opacity="0.6" stroke="#8493b0" stroke-opacity="0.34"/>
+  <text x="24" y="36" font-family="Arial,sans-serif" font-size="15" font-weight="600" fill="#1c2434">Inspiration Library</text>
+  <text x="1416" y="34" text-anchor="end" font-family="Arial,sans-serif" font-size="13" fill="#4d5b77">Settings</text>
+  <rect x="0" y="56" width="296" height="844" fill="#ffffff" fill-opacity="0.58" stroke="#8493b0" stroke-opacity="0.34"/>
+  <text x="20" y="90" font-family="Arial,sans-serif" font-size="11" font-weight="500" fill="#4d5b77">Data folder</text>
+  <rect x="20" y="100" width="256" height="40" rx="16" fill="#ffffff" fill-opacity="0.78" stroke="#8493b0" stroke-opacity="0.34"/>
+  <text x="28" y="125" font-family="Consolas,monospace" font-size="11" fill="#4d5b77">C:/your/data/path</text>
+  <text x="20" y="180" font-family="Arial,sans-serif" font-size="11" font-weight="500" fill="#4d5b77">Tags</text>
+  <rect x="296" y="56" width="1144" height="64" fill="#ffffff" fill-opacity="0.56" stroke="#8493b0" stroke-opacity="0.34"/>
+  <rect x="320" y="72" width="480" height="40" rx="20" fill="#ffffff" fill-opacity="0.82" stroke="#8493b0" stroke-opacity="0.34"/>
+  <text x="360" y="97" font-family="Arial,sans-serif" font-size="13" fill="#7f8da9">Search images...</text>
+  <rect x="296" y="120" width="1144" height="756" fill="#f4f7fc" fill-opacity="0.5"/>
+  <text x="868" y="480" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#7f8da9">Image grid (masonry / grid)</text>
+  <rect x="0" y="860" width="1440" height="40" fill="#ffffff" fill-opacity="0.62" stroke="#8493b0" stroke-opacity="0.34"/>
+  <text x="20" y="884" font-family="Arial,sans-serif" font-size="11" fill="#4d5b77">Status - count - path</text>

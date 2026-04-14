@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+<<<<<<< HEAD
   --color-bg-primary: #131416;
   --color-bg-secondary: #1a1c20;
   --color-bg-card: #23262b;
@@ -11,12 +12,32 @@
   --color-text-primary: #f6f7fb;
   --color-text-secondary: #b7bcc8;
   --color-text-disabled: #727887;
+=======
+  --color-bg-page: #ffffff;
+  --color-bg-primary: #ffffff;
+  --color-bg-sidebar: #f7f7f7;
+  --color-bg-secondary: #f0f2f5;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-selected: #ebebeb;
+  --color-border: #e8e8e8;
+  --color-accent: #5b8ff9;
+  --color-accent-hover: #4a7de8;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-text-disabled: #999999;
+>>>>>>> 57eddd3 (Initial commit)
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
 
+<<<<<<< HEAD
   --font-family-sans: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-family-mono: "JetBrains Mono", "SF Mono", "IBM Plex Mono", Consolas, monospace;
+=======
+  --font-family-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+>>>>>>> 57eddd3 (Initial commit)
 }
 
 * {
@@ -35,22 +56,34 @@ body {
   font-family: var(--font-family-sans);
   font-size: 14px;
   line-height: 1.5;
+<<<<<<< HEAD
   color: var(--color-text-primary);
   background:
     radial-gradient(circle at top, rgba(91, 140, 255, 0.12), transparent 28%),
     radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 24%),
     var(--color-bg-primary);
+=======
+  letter-spacing: 0;
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+>>>>>>> 57eddd3 (Initial commit)
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
+<<<<<<< HEAD
   background:
     linear-gradient(180deg, rgba(255,255,255,0.02), transparent 22%),
     var(--color-bg-primary);
 }
 
 /* Scrollbar styling */
+=======
+  background: var(--color-bg-page);
+}
+
+>>>>>>> 57eddd3 (Initial commit)
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -61,15 +94,25 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
+<<<<<<< HEAD
   background: var(--color-border);
+=======
+  background: #d0d4dc;
+>>>>>>> 57eddd3 (Initial commit)
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+<<<<<<< HEAD
   background: var(--color-text-disabled);
 }
 
 /* Animation utilities */
+=======
+  background: #b8bec8;
+}
+
+>>>>>>> 57eddd3 (Initial commit)
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -124,14 +167,23 @@ body {
   animation: spin 1s linear infinite;
 }
 
+<<<<<<< HEAD
 /* Focus styles */
+=======
+>>>>>>> 57eddd3 (Initial commit)
 *:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
+<<<<<<< HEAD
 /* Selection */
 ::selection {
   background-color: var(--color-accent);
   color: white;
+=======
+::selection {
+  background-color: rgba(91, 143, 249, 0.25);
+  color: var(--color-text-primary);
+>>>>>>> 57eddd3 (Initial commit)
 }

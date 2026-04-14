@@ -6,9 +6,6 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: write
-
 jobs:
   build:
     strategy:
@@ -17,12 +14,10 @@ jobs:
         include:
           - os: macos-latest
             artifact_name: gallery-cache-macos
-            build_command: npm run tauri build -- --bundles app
             artifact_path_1: src-tauri/target/release/bundle/macos
-            artifact_path_2: src-tauri/target/release/bundle/macos/*.zip
+            artifact_path_2: src-tauri/target/release/bundle/dmg
           - os: windows-latest
             artifact_name: gallery-cache-windows
-            build_command: npm run tauri build -- --bundles nsis,msi
             artifact_path_1: src-tauri/target/release/bundle/nsis
             artifact_path_2: src-tauri/target/release/bundle/msi
 
@@ -50,12 +45,7 @@ jobs:
         run: npm ci
 
       - name: Build desktop bundle
-        run: ${{ matrix.build_command }}
-
-      - name: Archive macOS app bundle
-        if: matrix.os == 'macos-latest'
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent "src-tauri/target/release/bundle/macos/Gallery Cache.app" "src-tauri/target/release/bundle/macos/Gallery-Cache-${{ github.ref_name }}-macos.zip"
+        run: npm run tauri build
 
       - name: Upload bundle artifacts
         uses: actions/upload-artifact@v4
@@ -65,31 +55,3 @@ jobs:
           path: |
             ${{ matrix.artifact_path_1 }}
             ${{ matrix.artifact_path_2 }}
-
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: gallery-cache-macos
-          path: release-assets/macos
-
-      - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: gallery-cache-windows
-          path: release-assets/windows
-
-      - name: Create or update GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            release-assets/macos/**/*
-            release-assets/windows/**/*
-          generate_release_notes: true
-          draft: false
-          prerelease: false

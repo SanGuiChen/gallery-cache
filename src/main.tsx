@@ -51,7 +51,11 @@ class RootErrorBoundary extends React.Component<React.PropsWithChildren, RootErr
               padding: "24px",
             }}
           >
+<<<<<<< HEAD
             <h1 style={{ fontSize: "20px", marginBottom: "12px" }}>Gallery Cache 启动失败</h1>
+=======
+            <h1 style={{ fontSize: "20px", marginBottom: "12px" }}>idealib 启动失败</h1>
+>>>>>>> 57eddd3 (Initial commit)
             <p style={{ color: "#cfcfcf", lineHeight: 1.6 }}>
               应用已经捕获到前端渲染错误，至少不会再只显示黑屏。
             </p>

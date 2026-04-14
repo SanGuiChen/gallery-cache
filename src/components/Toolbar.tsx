@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 import React, { useState, useRef } from 'react';
 import { useAppStore } from '../stores/appStore';
+=======
+import React from 'react';
+import { useAppStore } from '../stores/appStore';
+import { IconFolder, IconSearch } from './icons/DeskIcons';
+>>>>>>> 57eddd3 (Initial commit)
 
 export const Toolbar: React.FC = () => {
   const searchQuery = useAppStore(state => state.searchQuery);
   const setSearchQuery = useAppStore(state => state.setSearchQuery);
+<<<<<<< HEAD
   const downloadImage = useAppStore(state => state.downloadImage);
   const images = useAppStore(state => state.images);
   const viewMode = useAppStore(state => state.viewMode);
@@ -269,6 +276,47 @@ export const Toolbar: React.FC = () => {
           </div>
         </div>
       )}
+=======
+  const importImages = useAppStore(state => state.importImages);
+
+  return (
+    <div
+      className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-page)]"
+      style={{ padding: '0 25px' }}
+    >
+      <div className="w-full max-w-xs">
+        <div className="relative">
+          <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-disabled]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder=""
+            className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] py-2 pl-9 pr-4 text-sm text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-disabled)] focus:border-[var(--color-accent)]"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-center gap-[15px]">
+        <button
+          type="button"
+          onClick={() => void importImages()}
+          className="flex shrink-0 items-center justify-center text-[var(--color-accent)] transition-colors hover:text-[var(--color-accent-hover)]"
+          title="本地导入"
+        >
+          <IconFolder className="h-5 w-5" />
+        </button>
+      </div>
+>>>>>>> 57eddd3 (Initial commit)
     </div>
   );
 };

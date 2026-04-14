@@ -1,8 +1,14 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
+<<<<<<< HEAD
   "productName": "Gallery Cache",
   "version": "0.1.0",
   "identifier": "com.gallerycache.desktop",
+=======
+  "productName": "idealib",
+  "version": "0.1.0",
+  "identifier": "com.idealib.desktop",
+>>>>>>> 57eddd3 (Initial commit)
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +19,11 @@
     "withGlobalTauri": true,
     "windows": [
       {
+<<<<<<< HEAD
         "title": "Gallery Cache",
+=======
+        "title": "idealib",
+>>>>>>> 57eddd3 (Initial commit)
         "width": 1200,
         "height": 800,
         "minWidth": 800,
